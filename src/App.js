@@ -3,7 +3,9 @@ import io from "socket.io-client";
 import "./App.css";
 
 let socket;
+// const CONNECTION_PORT = "172.16.1.173:3002/";
 const CONNECTION_PORT = "localhost:3002/";
+const rooms = ['room1', 'room2', 'room3', 'room4']
 
 function App() {
   // Before Login
@@ -13,22 +15,28 @@ function App() {
 
   // After Login
   const [message, setMessage] = useState("");
+  const [unreadMessage, setUnreadMessage] = useState(0)
   const [messageList, setMessageList] = useState([]);
 
   useEffect(() => {
     socket = io(CONNECTION_PORT);
+    socket.emit("join_all_room", rooms)
   }, []);
 
   useEffect(() => {
     socket.on("receive_message", (data) => {
+      setUnreadMessage(unreadMessage + 1)
       setMessageList([...messageList, data]);
     });
   });
 
+  useEffect(() => {
+    console.log(unreadMessage);
+  }, [unreadMessage])
+
   const connectToRoom = () => {
     setLoggedIn(true);
-    socket.emit("join_room", room);
-    socket.emit("online", userName);
+    // socket.emit("join_room", room);
   };
 
   const readMessage = () => {
